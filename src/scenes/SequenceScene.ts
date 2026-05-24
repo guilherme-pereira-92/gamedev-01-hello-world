@@ -3,6 +3,7 @@ import { COLORS, COLOR_HEX, TEXT_PRESETS, FONTS } from "../theme";
 import { playTone, unlockAudio } from "../audio";
 import { takeScreenshot } from "../screenshot";
 import { drawDiagonalScanlines, createPulsingDot, addCornerLabel } from "../ui";
+import { isTouchDevice } from "../input";
 
 type PanelId = "up" | "right" | "down" | "left";
 type GameState = "idle" | "show" | "input" | "wrong" | "gameover";
@@ -84,6 +85,14 @@ export class SequenceScene extends Phaser.Scene {
 
     // AudioContext só pode ser destravado por gesto do usuário (autoplay policy).
     kb.on("keydown", unlockAudio);
+    this.input.on("pointerdown", unlockAudio);
+
+    // Touch: tap em qualquer lugar fora dos painéis = começar / reiniciar
+    this.input.on("pointerdown", (_pointer: Phaser.Input.Pointer, targets: unknown[]) => {
+      if (targets.length > 0) return; // se acertou painel, deixa o panel handler tratar
+      if (this.state === "idle") this.startGame();
+      else if (this.state === "gameover") this.startGame();
+    });
 
     this.refreshStatus();
     this.showIdleScreen();
@@ -129,6 +138,13 @@ export class SequenceScene extends Phaser.Scene {
       const bg = this.add.rectangle(cfg.cx, cfg.cy, cfg.width, cfg.height, COLOR_HEX.bgSoft);
       bg.setStrokeStyle(1, COLOR_HEX.border, 1);
       this.panelBgs.set(cfg.id, bg);
+
+      // Mobile/desktop: painéis são tappáveis. Em mobile é a forma principal
+      // de input; em desktop é alternativa às setas/WASD.
+      bg.setInteractive({ useHandCursor: true });
+      bg.on("pointerdown", () => {
+        if (this.state === "input") this.handlePlayerInput(cfg.id);
+      });
 
       const arrow = this.add
         .text(cfg.cx, cfg.cy, cfg.arrow, {
@@ -202,7 +218,11 @@ export class SequenceScene extends Phaser.Scene {
         ? `melhor: fase ${this.bestPhase}    ·    memorize e repita`
         : "memorize a sequência    ·    repita pra avançar",
     );
-    this.bottomHint.setText("ESPAÇO COMEÇAR    ·    ↑ ↓ ← →    ·    K SCREENSHOT");
+    this.bottomHint.setText(
+      isTouchDevice()
+        ? "TOQUE PRA COMEÇAR    ·    TOQUE OS PAINÉIS"
+        : "ESPAÇO COMEÇAR    ·    ↑ ↓ ← →    ·    K SCREENSHOT",
+    );
   }
 
   private startGame() {
@@ -246,7 +266,11 @@ export class SequenceScene extends Phaser.Scene {
   private beginPlayerInput() {
     this.state = "input";
     this.centerSubtitle.setText("sua vez");
-    this.bottomHint.setText("REPITA USANDO  ↑  ↓  ←  →    OU    W  A  S  D");
+    this.bottomHint.setText(
+      isTouchDevice()
+        ? "TOQUE OS PAINÉIS NA MESMA ORDEM"
+        : "REPITA USANDO  ↑  ↓  ←  →    OU    W  A  S  D",
+    );
   }
 
   private handlePlayerInput(pressed: PanelId) {
@@ -298,7 +322,11 @@ export class SequenceScene extends Phaser.Scene {
         ? `parou na fase ${failedAtPhase}    ·    completou ${completed}`
         : `parou na fase ${failedAtPhase}`;
       this.centerSubtitle.setText(summary);
-      this.bottomHint.setText("R TENTAR DE NOVO    ·    K SCREENSHOT");
+      this.bottomHint.setText(
+        isTouchDevice()
+          ? "TOQUE PRA TENTAR DE NOVO"
+          : "R TENTAR DE NOVO    ·    K SCREENSHOT",
+      );
     });
   }
 
