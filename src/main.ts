@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { SequenceScene } from "./scenes/SequenceScene";
 import { COLORS, FONT_NAMES } from "./theme";
+import { isMobileLayout } from "./input";
 
 async function bootstrap() {
   try {
@@ -10,15 +11,15 @@ async function bootstrap() {
     ]);
   } catch {}
 
+  const mobile = isMobileLayout();
+
   new Phaser.Game({
     type: Phaser.AUTO,
     backgroundColor: COLORS.bg,
     parent: "game",
-    scale: {
-      mode: Phaser.Scale.RESIZE,
-      width: "100%",
-      height: "100%",
-    },
+    scale: mobile
+      ? { mode: Phaser.Scale.RESIZE, width: "100%", height: "100%" }
+      : { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: 800, height: 600 },
     input: { activePointers: 3 },
     scene: SequenceScene,
   });
