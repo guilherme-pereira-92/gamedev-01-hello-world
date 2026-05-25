@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "number": 1,
+  "slug": "01-hello-world",
+  "title": "Sequence",
+  "shortDescription": "Memória estilo Genius/Simon — 4 painéis, áudio sintetizado, fases progressivas.",
+  "stack": ["TypeScript", "Phaser 3", "Vite", "Web Audio API"],
+  "concepts": [
+    "state machine",
+    "Web Audio synth (oscillator + envelope ADSR)",
+    "AudioContext unlock",
+    "timing com delayedCall",
+    "sequência cumulativa por fase",
+    "camera shake + flash feedback",
+    "persistência localStorage"
+  ],
+  "publishedAt": "2026-05-24",
+  "live": "https://guilherme-pereira-92.github.io/gamedev-01-hello-world/",
+  "repo": "https://github.com/guilherme-pereira-92/gamedev-01-hello-world",
+  "cover": "screenshots/cover.png",
+  "playable": true,
+  "mobile": "responsive"
+}
