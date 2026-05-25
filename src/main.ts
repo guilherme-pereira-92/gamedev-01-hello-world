@@ -8,23 +8,18 @@ async function bootstrap() {
       document.fonts.load(`16px "${FONT_NAMES.mono}"`),
       document.fonts.load(`64px "${FONT_NAMES.display}"`),
     ]);
-  } catch {
-    // sem rede — segue com fontes do sistema
-  }
+  } catch {}
 
   new Phaser.Game({
     type: Phaser.AUTO,
     backgroundColor: COLORS.bg,
     parent: "game",
     scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 800,
-      height: 600,
+      mode: Phaser.Scale.RESIZE,
+      width: "100%",
+      height: "100%",
     },
-    input: {
-      activePointers: 3, // multi-touch (até 2 dedos + mouse)
-    },
+    input: { activePointers: 3 },
     scene: SequenceScene,
   });
 }
